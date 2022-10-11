@@ -165,12 +165,17 @@ u64 encrypt(u64 plainText, vector<u64> roundKeys);
 int main(int argc, char *argv[]) {
   // u64  plainText = 0x123456ABCD132536;
   // u64  key = 0xAABB09182736CCDD;
-  string PT, K, condition , fileName;
+  string PT, x, K, condition , fileName;
  
   condition = argv[1];
   fileName = argv[2];
   K = argv[3];
- PT=storeData(fileName);
+  string s2 = ".hex";
+  if (K.find(s2)!=-1){
+  x=storeData(K);
+  K = x;
+  }
+  PT=storeData(fileName);
   u64  plainText = stoull (PT, nullptr, 16);
   u64  key = stoull (K, nullptr, 16);
 
