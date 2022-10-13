@@ -6,7 +6,7 @@
 #include <fstream>
 #include <string>
 //####################
-#include <iomanip>  
+// #include <iomanip>  
 #include <time.h>
 
 #ifdef __GNUC__
@@ -24,6 +24,7 @@
 #define DES2Cindex(index, n) (n - index)
 
 #define C2DESindex(index, n) (n - index)
+typedef unsigned long long u64;
 
 
 /*
@@ -50,11 +51,19 @@ string storeData(string fileName)
   }
   return output ; 
 }
-string To_string(unsigned long long num)
+/*string To_string(unsigned long long num)
 {
     stringstream oss;
     oss << hex <<  uppercase <<setfill('0') <<setw(sizeof(unsigned long long)*2) << num;
     return oss.str();
+}*/
+string To_string(u64 num)
+{
+    static const char *digits = "0123456789ABCDEF";
+    string rc(16, '0');
+    for (size_t i = 0, j = 60; i < 16; ++i, j -= 4)
+        rc[i] = digits[(num >> j) & 0x0f];
+    return rc;
 }
 int initialPermutation[64] = {
                                58, 50, 42, 34, 26, 18, 10, 2, 60, 52, 44, 36, 28, 20, 12, 4,
@@ -160,7 +169,7 @@ int straightPermutationTable[32] = { 16, 7, 20, 21, 29, 12, 28,  17, 1, 15, 23, 
                                      2, 8, 24, 14,32, 27, 3, 9,19, 13, 30, 6,22, 11, 4, 25 };
 
 
-typedef unsigned long long u64;
+// typedef unsigned long long u64;
 
 u64 permute(u64 plainText, int * permutationTable, int inputLen, int outputLen);
 
