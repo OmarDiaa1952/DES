@@ -5,6 +5,10 @@
 // #include <stdint.h>
 #include <fstream>
 #include <string>
+//####################
+#include <iomanip>  
+#include <time.h>
+
 #ifdef __GNUC__
 # define __rdtsc __builtin_ia32_rdtsc
 #else
@@ -45,6 +49,12 @@ string storeData(string fileName)
         output += str ;
   }
   return output ; 
+}
+string To_string(unsigned long long num)
+{
+    stringstream oss;
+    oss << hex <<  uppercase <<setfill('0') <<setw(sizeof(unsigned long long)*2) << num;
+    return oss.str();
 }
 int initialPermutation[64] = {
                                58, 50, 42, 34, 26, 18, 10, 2, 60, 52, 44, 36, 28, 20, 12, 4,
@@ -162,6 +172,9 @@ vector<u64> getRoundKeys(u64 key);
 
 u64 encrypt(u64 plainText, vector<u64> roundKeys);
 
+
+//3##################################-------  MAIN --------######################################
+
 int main(int argc, char *argv[]) {
   // u64  plainText = 0x123456ABCD132536;
   // u64  key = 0xAABB09182736CCDD;
@@ -176,24 +189,54 @@ int main(int argc, char *argv[]) {
   K = x;
   }
   PT=storeData(fileName);
-  u64  plainText = stoull (PT, nullptr, 16);
+ // u64  plainText = stoull (PT, nullptr, 16);
   u64  key = stoull (K, nullptr, 16);
-
   vector<u64> roundKeys = getRoundKeys(key);
 
   if(condition == "encrypt"){
+    printf("Cipher Text is loaded into the file Encryption.hex : ..........");
     long long t1 = __rdtsc();
-    u64 cipher = encrypt(plainText, roundKeys);
+    clock_t start = clock();
+      ofstream Efile("Encryption.hex");
+      if(PT[0]=='0' && (PT[1]=='x'||PT[1]=='X')){
+        PT = PT.substr(2);
+      }
+
+      for (int i = 0; i < PT.size()/16; i++)
+      {
+      string block_str = PT.substr(i*16,16);
+      u64  plainText = stoull (block_str, nullptr, 16);
+      u64 cipher = encrypt(plainText, roundKeys);
+      Efile<<To_string(cipher);
+      }
     long long t2 = __rdtsc();
-    printf("Cipher: %016llX\n", cipher);
+    clock_t end = clock();
+    printf("\n");
+    printf("Time: %lld s\n", (end-start)/CLOCKS_PER_SEC);
     printf("Cycles: %lld\n", t2-t1);
+
   }
   else if(condition == "decrypt"){
     reverse(roundKeys.begin(), roundKeys.end());
+     printf("Plain Text is loaded into the file Decryption.hex : ..........");
     long long t1 = __rdtsc();
-    u64 cipher = encrypt(plainText, roundKeys);
+    clock_t start = clock();
+      ofstream Efile("Decryption.hex");
+      if(PT[0]=='0' && (PT[1]=='x'||PT[1]=='X')){
+        PT = PT.substr(2);
+      }
+
+      for (int i = 0; i < PT.size()/16; i++)
+      {
+      string block_str = PT.substr(i*16,16);
+      u64  plainText = stoull (block_str, nullptr, 16);
+      u64 cipher = encrypt(plainText, roundKeys);
+      Efile<<To_string(cipher);
+      }
     long long t2 = __rdtsc();
-    printf("Plain: %016llX\n", cipher);
+    clock_t end = clock();
+    printf("\n");
+    printf("Time: %lld s\n", (end-start)/CLOCKS_PER_SEC);
     printf("Cycles: %lld\n", t2-t1);
   }
   else{
@@ -286,3 +329,4 @@ u64 permute(u64 plainText, int * permutationTable, int inputLen, int outputLen){
   out|=(plainText>>(inputLen-permutationTable[outputLen-1-i])&1)<<i;
   return out;
 }
+
