@@ -34,6 +34,41 @@ typedef unsigned long long u64;
 
 using namespace std;
 
+ // we build inline functions because we use them all the time
+inline u64 ASCII2u64(string b)
+{
+    switch(b.size()){
+    case 8:
+    return ((uint64_t)(uint8_t)b[0] << 56) | ((uint64_t)(uint8_t)b[1] << 48) | ((uint64_t)(uint8_t)b[2] << 40) | ((uint64_t)(uint8_t)b[3] << 32) | ((uint64_t)(uint8_t)b[4] << 24) | ((uint64_t)(uint8_t)b[5] << 16) | ((uint64_t)(uint8_t)b[6] << 8) | ((uint64_t)(uint8_t)b[7]);
+    case 7:
+    return ((uint64_t)(uint8_t)b[0] << 56) | ((uint64_t)(uint8_t)b[1] << 48) | ((uint64_t)(uint8_t)b[2] << 40) | ((uint64_t)(uint8_t)b[3] << 32) | ((uint64_t)(uint8_t)b[4] << 24) | ((uint64_t)(uint8_t)b[5] << 16) | ((uint64_t)(uint8_t)b[6] << 8);
+    case 6:
+    return ((uint64_t)(uint8_t)b[0] << 56) | ((uint64_t)(uint8_t)b[1] << 48) | ((uint64_t)(uint8_t)b[2] << 40) | ((uint64_t)(uint8_t)b[3] << 32) | ((uint64_t)(uint8_t)b[4] << 24) | ((uint64_t)(uint8_t)b[5] << 16);
+    case 5:
+    return ((uint64_t)(uint8_t)b[0] << 56) | ((uint64_t)(uint8_t)b[1] << 48) | ((uint64_t)(uint8_t)b[2] << 40) | ((uint64_t)(uint8_t)b[3] << 32) | ((uint64_t)(uint8_t)b[4] << 24);
+    case 4:
+    return ((uint64_t)(uint8_t)b[0] << 56) | ((uint64_t)(uint8_t)b[1] << 48) | ((uint64_t)(uint8_t)b[2] << 40) | ((uint64_t)(uint8_t)b[3] << 32);
+    case 3:
+    return ((uint64_t)(uint8_t)b[0] << 56) | ((uint64_t)(uint8_t)b[1] << 48) | ((uint64_t)(uint8_t)b[2] << 40);
+    case 2:
+    return ((uint64_t)(uint8_t)b[0] << 56) | ((uint64_t)(uint8_t)b[1] << 48);
+    case 1:
+    return ((uint64_t)(uint8_t)b[0] << 56);
+    default:
+    return 0000000000000;
+
+    }
+}
+
+inline string u64ToASCII(u64 a)
+{
+    string result = "";
+    for (unsigned int i = 0; i < 8; ++i)
+    {
+        result += (unsigned char)((a >> (56 - (i << 3))) & 0xFF);
+    }
+    return result;
+}
 string storeData(string fileName)
 {
   string str , output;
@@ -51,12 +86,7 @@ string storeData(string fileName)
   }
   return output ; 
 }
-/*string To_string(unsigned long long num)
-{
-    stringstream oss;
-    oss << hex <<  uppercase <<setfill('0') <<setw(sizeof(unsigned long long)*2) << num;
-    return oss.str();
-}*/
+
 string To_string(u64 num)
 {
     static const char *digits = "0123456789ABCDEF";
@@ -181,43 +211,55 @@ vector<u64> getRoundKeys(u64 key);
 
 u64 encrypt(u64 plainText, vector<u64> roundKeys);
 
-
-//3##################################-------  MAIN --------######################################
+string exec(const char* cmd);
+//##################################-------  MAIN --------######################################
 
 int main(int argc, char *argv[]) {
   // u64  plainText = 0x123456ABCD132536;
   // u64  key = 0xAABB09182736CCDD;
-  string PT, x, K, condition , fileName;
- 
+  string x, K, condition , fileName ,str;
+  
+  
   condition = argv[1];
   fileName = argv[2];
+  //fileName = exec("zenity --file-selection");
   K = argv[3];
-  string s2 = ".hex";
-  if (K.find(s2)!=-1){
+  if (K.find(".hex")!=-1 ||K.find(".txt")!=-1  ){
   x=storeData(K);
   K = x;
   }
-  PT=storeData(fileName);
- // u64  plainText = stoull (PT, nullptr, 16);
   u64  key = stoull (K, nullptr, 16);
   vector<u64> roundKeys = getRoundKeys(key);
 
-  if(condition == "encrypt"){
-    printf("Cipher Text is loaded into the file Encryption.hex : ..........");
-    long long t1 = __rdtsc();
-    clock_t start = clock();
-      ofstream Efile("Encryption.hex");
-      if(PT[0]=='0' && (PT[1]=='x'||PT[1]=='X')){
-        PT = PT.substr(2);
-      }
+//cout << "Input from Zenity is: "<<fileName << endl;
+// starting of reading the file & encrypt line by line not store the all content of the file into string
+ifstream file(fileName);
+if (file.fail()){
+            cout << "the file failed to open, please enter the correct FileName " << endl;
+            return 0;
+}
 
-      for (int i = 0; i < PT.size()/16; i++)
-      {
-      string block_str = PT.substr(i*16,16);
-      u64  plainText = stoull (block_str, nullptr, 16);
-      u64 cipher = encrypt(plainText, roundKeys);
-      Efile<<To_string(cipher);
-      }
+  if(condition == "encrypt"){
+      printf("Cipher Text is loaded into the file Encryption.hex & Encryption.txt: ..........");
+      long long t1 = __rdtsc();
+      clock_t start = clock();
+      ofstream Efile("Encryption.hex");
+      ofstream Efile1("Encryption.txt");
+    
+  while (getline(file, str))
+  {
+    for (int i = 0; i < (str.size()); )
+        {
+        u64  plainText = ASCII2u64(str.substr(i,8));
+        u64 cipher = encrypt(plainText, roundKeys);
+        Efile<<To_string(cipher);
+        Efile1<<u64ToASCII(cipher);
+        i+=8;
+        }
+        Efile<<endl;
+
+  }
+   
     long long t2 = __rdtsc();
     clock_t end = clock();
     printf("\n");
@@ -225,23 +267,26 @@ int main(int argc, char *argv[]) {
     printf("Cycles: %lld\n", t2-t1);
 
   }
+
+
   else if(condition == "decrypt"){
     reverse(roundKeys.begin(), roundKeys.end());
-     printf("Plain Text is loaded into the file Decryption.hex : ..........");
+    printf("Plain Text is loaded into the file Decryption.txt : ..........");
     long long t1 = __rdtsc();
     clock_t start = clock();
-      ofstream Efile("Decryption.hex");
-      if(PT[0]=='0' && (PT[1]=='x'||PT[1]=='X')){
-        PT = PT.substr(2);
-      }
+    ofstream f ("Decryption.txt");
 
-      for (int i = 0; i < PT.size()/16; i++)
+ while (getline(file, str))
+  {
+      for (int i = 0; i < str.size(); )
       {
-      string block_str = PT.substr(i*16,16);
-      u64  plainText = stoull (block_str, nullptr, 16);
+      u64  plainText = stoull (str.substr(i,16), nullptr, 16);
       u64 cipher = encrypt(plainText, roundKeys);
-      Efile<<To_string(cipher);
+      f<<u64ToASCII(cipher);
+      i+=16;
       }
+      f<<endl;
+  }
     long long t2 = __rdtsc();
     clock_t end = clock();
     printf("\n");
@@ -254,6 +299,24 @@ int main(int argc, char *argv[]) {
 
   return 0;
 }
+
+string exec(const char* cmd) {
+    char buffer[128];
+    std::string result = "";
+    FILE* pipe = popen(cmd, "r");
+    if (!pipe) throw std::runtime_error("popen() failed!");
+    try {
+        while (fgets(buffer, sizeof buffer, pipe) != NULL) {
+            result += buffer;
+        }
+    } catch (...) {
+        pclose(pipe);
+        throw;
+    }
+    pclose(pipe);
+    return result;
+}
+
 
 u64 encrypt(u64 plainText, vector<u64> roundKeys){
   u64 rawData = permute(plainText, initialPermutation, 64, 64);
