@@ -5,7 +5,10 @@ if [ "$1" == "-h" ]; then
   exit 0
 fi
 read -p 'Enter your Operation (encrypt/decrypt): ' operation
-read -p 'Enter your hex filepath: ' hexf
-read -p 'Enter Key: ' key
- 
-g++ des.cpp -o DES;./DES $operation $hexf $key
+echo  -n 'Enter your hex filepath: ' 
+FILE=`zenity --file-selection --title="Select a File"`
+echo "$FILE" 
+echo -n 'Enter Key: '
+Key_FILE=`zenity --file-selection --title="Select a Key_File"`
+echo "$Key_FILE"  
+g++ des.cpp -o DES;./DES $operation $FILE $Key_FILE
