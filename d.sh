@@ -5,7 +5,7 @@ if [ "$1" == "-h" ]; then
   exit 0
 fi
 read -p 'Enter your Operation (encrypt/decrypt): ' operation
-echo  -n 'Enter your hex filepath: ' 
+echo  -n 'Enter your filepath: ' 
 FILE=`zenity --file-selection --title="Select a File"`
 echo "$FILE" 
 echo -n 'Enter Key: '
