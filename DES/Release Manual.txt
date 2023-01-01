@@ -1,0 +1,88 @@
+The submitted Files are : 
+1/ A Bash File (d.sh)
+2/ A C++ File (des.cpp)
+3/ A Text File for manual usage (Release Manual.txt)
+
+--------------------------------------------------------------------------------------------------------
+
+This Project is submitted to Dr/Mohamed Sobh & Eng/Abanob Medhat , For Computer Network & Security Course (CSE451s)
+
+------------------------------------------------------------------------------------------------------------
+
+
+Features added in the Project:
+
+1/ a bash file to run the project (also there is a -h (help command) to guide you of how to use the bash file)
+2/ Padding added to input files if i/p file came not in 16 character format for hexadecimal , or 8 characters for plaintext i/p
+3/ Browse i/p files for key & plaintext from anywhere on the OS / Machine
+
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+How to Run Project on linux ?
+
+A. Option 1 (Using .cpp file only): 
+
+i.To compile file type : 
+
+g++ des.cpp -o <compiled file name>
+
+
+ii. To execute operations (encrypt/decrypt):
+
+./<compiled file name> <condition> <input file name> <key name>
+
+
+<condition> = encrypt or decrypt
+<input file name> = a .txt file(encrypt) or a .hex file (encrypt/decrypt)  or as a plaintext (encrypt/decrypt)
+<key name> = a .txt file or a .hex file or as a plaintext 
+
+
+example1 Encrypt: 
+
+1/ g++ des.cpp -o DES
+
+2/ ./DES encrypt test.txt key.txt 
+
+produced files are : Encrypted.txt , Encrypted.hex
+
+
+example2 decrypt: 
+
+1/ g++ des.cpp -o DES
+
+2/ ./DES encrypt Encrypted.txt key.txt 
+
+produced files are : Decrypted.txt
+
+---------------------------------------------------------------------------------------------------
+
+B. Option 2 (using bash file): Warning bash file should be in the same path as .cpp file in order for it to run)
+
+i. To open bash file type:
+
+-> bash d.sh
+
+ii. First it would ask you to write either encrypt or decrypt for the operation to be done:
+
+-> Enter your operation to be performed (encrypt/decrypt): ...............
+
+ii. Second it will take from you the input file to encrypted/decrypted (.txt or .hex), a new window will open for you to select/browse input file from anywhere on the machine/OS :
+
+-> Enter your File/Hex File : .................. <path of file you selected will be shown here>
+
+iii. ii. Second it will take from you the key file to encrypt/decrypt input file selected before(.txt or .hex), a new window will open for you to select/browse key file from anywhere on the machine/OS :
+-> Enter your Key File : .................. <path of file you selected will be shown here> 
+
+
+After finishing o/p files will be shown in the same directory as the i/p files.
+
+
+
+
+
+
+
+
+
+
+
